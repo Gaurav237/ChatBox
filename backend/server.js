@@ -1,6 +1,6 @@
 const express = require('express');
 const chats = require('./data/data');
-
+// for setting environment variables
 const dotenv = require('dotenv')
 dotenv.config();
 
