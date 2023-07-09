@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { VStack, StackDivider, FormControl, FormLabel, Input, InputGroup, InputRightElement, Button } from '@chakra-ui/react'
+import { VStack, StackDivider, FormControl, FormLabel, Input, InputGroup, InputRightElement, Button, useToast } from '@chakra-ui/react'
 
 const SignUp = () => {
     const [name, setName] = useState();
@@ -8,13 +8,64 @@ const SignUp = () => {
     const [confirmPassword, setConfirmPassword] = useState();
     const [profilePic, setProfilePic] = useState();
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const toast = useToast();
 
     const handleTogglePassword = () => {
         setShowPassword(!showPassword);
     }   
-    const postDetails = (pics) => {
 
+    const postImage = (picture) => {
+        setLoading(true); // while picture is processing, show loading
+
+        // if picture undefined, show toast
+        if(!picture){
+            toast({
+                title: 'Please Select an Image',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+                position: 'bottom'
+            });
+            return;
+        }
+
+        // checking if file is image type
+        if(picture.type === 'image/jpeg' || picture.type === 'iamge/png'){
+            // upload to cloudinary
+            const data = new FormData();
+            data.append('file', picture);
+            data.append('upload_preset', 'chat-box');
+            data.append('cloud_name', 'gaurav237');
+            
+            // make api call to upload file to cloudinary url
+            fetch('https://api.cloudinary.com/v1_1/gaurav237/image/upload', {
+                method:'post',
+                body: data
+            })
+            .then(res => res.json())
+            .then(data => {
+                setProfilePic(data.url.toString());
+                console.log(data.url.toString());
+                setLoading(false);
+            })
+            .catch(err => {
+                console.log(err);
+                setLoading(false);
+            });
+        }else{
+            toast({
+                title: 'Please Select an Image File Only',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+                position: 'bottom'
+            });
+            setLoading(false);
+            return;
+        }
     }
+
     const submitHandler = () => {
 
     }
@@ -79,7 +130,7 @@ const SignUp = () => {
             type='file'
             p={1.5}
             accept='image/*'  /* accepts only image files */
-            onChange={(e) => postDetails(e.target.files[0])} /* if user uploads multiple images, then just select 1st image */
+            onChange={(e) => postImage(e.target.files[0])} /* if user uploads multiple images, then just select 1st image */
             />
         </FormControl>
 
@@ -88,6 +139,7 @@ const SignUp = () => {
         width='100%'
         style={{marginTop: 15}}
         onClick={submitHandler}
+        isLoading={loading}
         >
             Sign Up
         </Button>
