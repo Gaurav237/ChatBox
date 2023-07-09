@@ -1,16 +1,71 @@
 import React, { useState } from 'react'
-import { VStack, StackDivider, FormControl, FormLabel, Input, InputGroup, InputRightElement, Button } from '@chakra-ui/react'
+import { VStack, StackDivider, FormControl, FormLabel, Input, InputGroup, InputRightElement, Button, useToast } from '@chakra-ui/react'
+import axios from 'axios'
+import { useHistory } from 'react-router-dom'
 
 const Login = () => {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const toast = useToast();
+    const history = useHistory();
     
     const handleTogglePassword = () => {
         setShowPassword(!showPassword);
     }
-    const submitHandler = () => {
 
+    const submitHandler = async () => {
+        setLoading(true);
+
+        if(!email || !password){
+            toast({
+                title: 'Please fill all the fields',
+                status: 'warning',
+                duration: 2000,
+                isClosable: true,
+                position: 'bottom'
+            });
+            setLoading(false);
+            return;
+        }
+
+        try{
+            const config = {
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            }
+
+            const { data } = await axios.post(
+                'api/user/login',
+                {email, password},
+                config
+            );
+            
+            toast({
+                title: 'Login Successfull',
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+                position: 'bottom'
+            });
+
+            localStorage.setItem('userInfo', JSON.stringify(data));
+
+            setLoading(false);
+            history.push('/chat'); // used to navigate to the "/chat" route
+        }catch(error) {
+            toast({
+                title: 'Error',
+                description: error.response.data.message,
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+                position: 'bottom'
+            });
+            setLoading(false);
+        }
     }
 
 
@@ -25,6 +80,7 @@ const Login = () => {
             <FormLabel>Email Id</FormLabel>
             <Input 
             placeholder='Enter here' 
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
             />
             </FormControl>
@@ -34,6 +90,7 @@ const Login = () => {
                     <Input
                     type= {showPassword ? 'text' : 'password'}
                     placeholder='Enter here'
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     >
                     </Input>
@@ -50,6 +107,7 @@ const Login = () => {
             width='100%'
             style={{marginTop: 15}}
             onClick={submitHandler}
+            isLoading={loading}
             >
                 Sign In 
            </Button>

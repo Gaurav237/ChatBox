@@ -130,6 +130,7 @@ const SignUp = () => {
                 isClosable: true,
                 position: 'bottom'
             });
+            setLoading(false);
         }
     }
 
