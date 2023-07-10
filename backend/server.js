@@ -1,6 +1,7 @@
 const express = require('express');
 const chats = require('./data/data');
 const userRoutes = require('./routes/userRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 const { notFound, errorHandler } = require('./middleware/errorHandlingMiddleware');
 // for setting environment variables
 const dotenv = require('dotenv');
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/user', userRoutes);
+app.use('/api/chat', chatRoutes);
 
 // API Error Handlers => (add at end of all routes)
 app.use(notFound); // handles requests for routes that do not exist
