@@ -57,7 +57,27 @@ const authenticateUser = asyncHandler(async(req, res) => {
     }
 });
 
+// /api/user?search=john
+const allUsers = asyncHandler(async(req, res) => {
+    const keyword = req.query.search 
+    ? {
+        // if either of queries is true, then it returns the filtered list
+        // 'i' performs case insensitive match
+        $or: [
+            {name: {$regex: req.query.search, $options: 'i'}},
+            {email: {$regex: req.query.search, $options: 'i'}}
+        ]
+      }
+    : {};
+    
+    console.log(keyword);
+    // find all users except logged-in user
+    const users = await User.find(keyword).find({ _id:{$ne: req.user._id} });
+    res.send(users);
+});
+
 module.exports = { 
     registerUser,
-    authenticateUser
+    authenticateUser,
+    allUsers
 }
