@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
+const User = require("../models/userModel");
 
 // it creates or fetches 1-on-1 chat 
 const accessChat = asyncHandler(async(req, res) => {
@@ -48,7 +49,32 @@ const accessChat = asyncHandler(async(req, res) => {
      }
 });
 
+// fetches all chat of user
+const fetchChats = asyncHandler(async(req, res) => {
+    try{
+        // finding all chats in which logged-in user is part of
+        Chat.find({users: { $elemMatch: {$eq: req.user._id }}})
+            .populate('users', '-password')
+            .populate('groupAdmin', '-password')
+            .populate('latestMessage')
+            .sort({updatedAt: -1})
+            .then(async (results) => {
+                results = await User.populate(results, {
+                    path: 'latestMessage.sender',
+                    select: 'name email profilePic'
+                });
+
+                res.status(200).send(results);
+            });
+        res.send(result);
+    }catch(err){
+        res.status(400);
+        throw new Error(err.message);
+    }
+});
+
 
 module.exports = {
-    accessChat
+    accessChat,
+    fetchChats  
 }
