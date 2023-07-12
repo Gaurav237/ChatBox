@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Text, Tooltip, Avatar, MenuDivider } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Text, Tooltip, Avatar, MenuDivider, useDisclosure, Input, Toast, useToast } from '@chakra-ui/react';
+import {Drawer,DrawerBody,DrawerFooter,DrawerHeader,DrawerOverlay,DrawerContent,DrawerCloseButton} from '@chakra-ui/react'
 import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { ChatState } from '../../context/ChatProvider';
 import ProfileModal from './ProfileModal';
 import { useHistory } from 'react-router-dom';
+import axios from 'axios';
+import ChatLoading from '../others/ChatLoading';
+import UserListItem from '../UserAvatar/UserListItem';
 
 const SideDrawer = () => {
   const [search, setSearch] = useState('');
@@ -12,16 +16,56 @@ const SideDrawer = () => {
   const [loadingChat, setLoadingChat] = useState(false);
   const { user } = ChatState();
   const history = useHistory();
-
-  console.log(user);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
     history.push("/");
   };
 
+  const handleSearch = async () => {
+    if(!search){
+      toast({
+        title: 'Please Enter Something in search',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+      return;
+    }
+
+    try{
+      setLoading(true);
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`
+        }
+      }
+      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      
+      setLoading(false);
+      setSearchResult(data);
+    }catch(err) {
+      toast({
+        title: 'Error Occured',
+        description: 'Failed to load the Search Results',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right'
+      });
+    }
+  }
+
+  const accessChat = (userId) => {
+
+  }
+
   return (
-    // <div>
+    <>
       <Box
         display='flex'
         justifyContent='space-between'
@@ -36,7 +80,7 @@ const SideDrawer = () => {
         label='Search users to chat'
         hasArrow
       >
-        <Button>
+        <Button onClick={onOpen}>
           <i className="fas fa-search" />
           <Text display={{base:'none', md:'flex'}} px={4}>
             Search User
@@ -83,7 +127,56 @@ const SideDrawer = () => {
       </Menu>
       </div>
     </Box>
-    // </div>
+
+    {/* Side Bar Drawer added  */}
+    <Drawer placement='left' isOpen={isOpen} onClose={onClose}>
+      <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>All Users</DrawerHeader>
+
+          <DrawerBody>
+            <Box
+              display={'flex'}
+              pb={2}
+              mb={5}
+            >
+             <Input
+              placeholder='Search by name or email'
+              mr={2}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+             />
+             <Button onClick={handleSearch}>
+               <i className="fas fa-search" />
+             </Button>
+            </Box>
+
+            {
+              loading
+              ? <ChatLoading />
+              : (
+                  searchResult?.map(user => {
+                    return <UserListItem
+                      key={user._id}
+                      user={user}
+                      handleFunction={() => accessChat(user._id)}
+                    />
+                  })
+                )
+            }
+
+          </DrawerBody>
+
+          {/* <DrawerFooter>
+            <Button variant='outline' mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorScheme='blue'>Save</Button>
+          </DrawerFooter> */}
+      </DrawerContent>
+    </Drawer>
+  </>
   )
 }
 
