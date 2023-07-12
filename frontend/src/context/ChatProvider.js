@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 const ChatContext = createContext();
 
 // Define the ChatProvider component   
-export const ChatProvider = ({children}) => {
+const ChatProvider = ({children}) => {
     // State variable to store user information
     const [user, setUser] = useState();
     const history = useHistory();

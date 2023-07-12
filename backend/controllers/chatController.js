@@ -30,7 +30,7 @@ const accessChat = asyncHandler(async(req, res) => {
         }
     });
 
-    if(isChat.length() > 0){
+    if(isChat.length > 0){
         res.send(isChat[0]);
     }else{
         // create a new chat
@@ -68,7 +68,6 @@ const fetchChats = asyncHandler(async(req, res) => {
 
                 res.status(200).send(results);
             });
-        res.send(result);
     }catch(err){
         res.status(400);
         throw new Error(err.message);
@@ -86,7 +85,7 @@ const createGroupChat = asyncHandler(async(req, res) => {
 
     var users = JSON.parse(req.body.users);
 
-    if(users.length() < 2){
+    if(users.length < 2){
         return res.status(400)
                 .send('More than 2 users are required to create a group chat');
     }
