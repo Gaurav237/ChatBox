@@ -8,7 +8,7 @@ const SignUp = () => {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [confirmPassword, setConfirmPassword] = useState();
-    const [profilePic, setProfilePic] = useState();
+    const [pic, setPic] = useState();
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const toast = useToast();
@@ -48,7 +48,7 @@ const SignUp = () => {
             })
             .then(res => res.json())
             .then(data => {
-                setProfilePic(data.url.toString());
+                setPic(data.url.toString());
                 console.log(data.url.toString());
                 setLoading(false);
             })
@@ -105,7 +105,7 @@ const SignUp = () => {
 
             const { data } = await axios.post(
                 'api/user',
-                {name, email, password, profilePic},
+                {name, email, password, pic},
                 config
             );
             
