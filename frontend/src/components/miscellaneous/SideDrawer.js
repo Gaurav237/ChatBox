@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Text, Tooltip, Avatar, MenuDivider, useDisclosure, Input, Toast, useToast } from '@chakra-ui/react';
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Text, Tooltip, Avatar, MenuDivider, useDisclosure, Input, Toast, useToast, Spinner } from '@chakra-ui/react';
 import {Drawer,DrawerBody,DrawerFooter,DrawerHeader,DrawerOverlay,DrawerContent,DrawerCloseButton} from '@chakra-ui/react'
 import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { ChatState } from '../../context/ChatProvider';
@@ -73,10 +73,13 @@ const SideDrawer = () => {
 
       const { data } = await axios.post('/api/chat', { userId }, config);
 
-      setSelectedChat(data);
-      setLoadingChat(false);
-      onClose();
+      // if selected chat is not present, then add this chat to chats list
+      if(!chats.find((c) => c._id === data._id)){
+        setChats([...chats, data]);
+      }
 
+      setSelectedChat(data);
+      onClose();
     }catch(err) {
       toast({
         title: 'Error fetching the chat',
@@ -87,6 +90,7 @@ const SideDrawer = () => {
         position: 'top-right'
       });
     }
+    setLoadingChat(false);
   }
 
   return (
@@ -190,15 +194,9 @@ const SideDrawer = () => {
                   })
                 )
             }
-
+            
+            { loadingChat && <Spinner size='lg' color='red.500' thickness='4px' /> }
           </DrawerBody>
-
-          {/* <DrawerFooter>
-            <Button variant='outline' mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme='blue'>Save</Button>
-          </DrawerFooter> */}
       </DrawerContent>
     </Drawer>
   </>

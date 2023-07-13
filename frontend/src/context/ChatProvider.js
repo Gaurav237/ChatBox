@@ -9,7 +9,7 @@ const ChatProvider = ({children}) => {
     // State variable to store user information
     const [user, setUser] = useState();
     const [selectedChat, setSelectedChat] = useState();
-    const [chats, setChats] = useState();
+    const [chats, setChats] = useState([]);
 
     const history = useHistory();
 
