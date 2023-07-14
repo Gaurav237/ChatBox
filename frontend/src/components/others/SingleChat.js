@@ -1,13 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ChatState } from '../../context/ChatProvider';
-import { Box, IconButton, Text } from '@chakra-ui/react';
+import { Box, FormControl, IconButton, Input, Spinner, Text, useToast } from '@chakra-ui/react';
 import { ArrowBackIcon, ChatIcon } from '@chakra-ui/icons';
 import { getSender, getSenderObject } from '../../config/ChatMethods';
 import ProfileModal from '../miscellaneous/ProfileModal'
 import UpdateGroupChatModal from '../miscellaneous/UpdateGroupChatModal';
 
 const SingleChat = ({fetchAgain, setFetchAgain}) => {
-  const { user, selectedChat, setSelectedChat } = ChatState(); 
+  const { user, selectedChat, setSelectedChat } = ChatState();
+
+  const [loading, setLoading] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [istyping, setIsTyping] = useState(false);
+  const toast = useToast();
+
+  const sendMessage = () => {
+    
+  }
+
+  const typingHandler = () => {
+
+  }
 
   return (
     <>
@@ -44,11 +59,9 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
         </>
       }
     </Box>
-    </>
-    }
-    
-    {/* <Box
-      d="flex"
+
+    <Box
+      display="flex"
       flexDir="column"
       justifyContent="flex-end"
       p={3}
@@ -58,8 +71,28 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
       borderRadius="lg"
       overflowY="hidden"
     >
-      
-    </Box> */}
+      {loading ? (
+        <Spinner size={'xl'} w={20} h={20} margin={'auto'} color={'teal'} thickness='6px' />
+      ): (
+        <>
+          <div>
+            {/* Messages */}
+          </div>
+        </>
+      )}
+
+      <FormControl onKeyDown={sendMessage} mt={3} isRequired>
+        <Input
+          variant="filled"
+          bg="white"
+          placeholder="Enter a message.."
+          value={newMessage}
+          onChange={typingHandler}
+        />
+      </FormControl>
+    </Box>
+    </>
+    }
     
     {/* if no chat is selected then show a message, to select a chat  */}
     { !selectedChat && 
