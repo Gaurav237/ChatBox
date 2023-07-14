@@ -72,8 +72,77 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
         setGroupChatName("");
     };
 
-    const handleRemove = () => {
+    const handleRemove = async (userToRemove) => {
+      if (selectedChat.groupAdmin._id !== user._id && userToRemove._id !== user._id) {
+        toast({
+          title: "Only admins can remove someone!",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+        return;
+      }
 
+      try {
+        setLoading(true);
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        };
+
+        const updatedChat = await axios.put(
+          `/api/chat/remove_from_group`,
+          {
+            chatId: selectedChat._id,
+            userId: userToRemove._id,
+          },
+          config
+        );
+
+        (userToRemove._id === user._id) ? setSelectedChat() : setSelectedChat(updatedChat.data);
+        setFetchAgain(!fetchAgain);
+
+        // If the removed user is the admin, assign a new admin
+        if (selectedChat.groupAdmin._id === userToRemove._id) {
+          const newAdmin = updatedChat.data.users[0]; // Assign the first user in the updated users array as the new admin
+
+          const updatedChatWithNewAdmin = await axios.put(
+            `/api/chat/updateAdmin`,
+            {
+              chatId: selectedChat._id,
+              newAdminId: newAdmin._id,
+            },
+            config
+          );
+
+          setSelectedChat(updatedChatWithNewAdmin.data);
+          setFetchAgain(!fetchAgain);
+
+          toast({
+            title: "New Admin Assigned",
+            description: `${newAdmin.name} has been assigned as the new admin of the group chat.`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: "bottom",
+          });
+        }
+
+      } catch(err) {
+        toast({
+          title: "Error Occurred",
+          description: err.response.data.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
+      setLoading(false);
+      setGroupChatName("");
     }
 
     const handleRename = async() => {
@@ -200,7 +269,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
         </ModalBody>
 
         <ModalFooter>
-        <Button onClick={() => handleRemove()} colorScheme='red'>
+        <Button onClick={() => handleRemove(user)} colorScheme='red'>
             Leave Group
         </Button>
         </ModalFooter>

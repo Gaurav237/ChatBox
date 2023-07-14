@@ -184,11 +184,35 @@ const removeFromGroup = asyncHandler(async(req, res) => {
     }
 });
 
+const updateAdmin = asyncHandler(async (req, res) => {
+    const { chatId, newAdminId } = req.body;
+  
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        groupAdmin: newAdminId,
+      },
+      {
+        new: true,
+      }
+    )
+    .populate('users', '-password')
+    .populate('groupAdmin', '-password');
+
+    if (!updatedChat) {
+      res.status(404);
+      throw new Error('Chat not found');
+    }
+  
+    res.status(200).json(updatedChat);
+});
+
 module.exports = {
     accessChat,
     fetchChats,
     createGroupChat,
     renameGroup,
     addToGroup,
-    removeFromGroup
+    removeFromGroup,
+    updateAdmin
 }
