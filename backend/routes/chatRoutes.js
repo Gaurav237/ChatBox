@@ -8,7 +8,7 @@ router.post('/', protect, accessChat);
 router.get('/', protect, fetchChats);
 router.post('/group', protect, createGroupChat);
 router.put('/rename', protect, renameGroup); 
-router.put('/add-to-group', protect, addToGroup);
-router.put('/remove-from-group', protect, removeFromGroup);
+router.put('/add_to_group', protect, addToGroup);
+router.put('/remove_from_group', protect, removeFromGroup);
 
 module.exports = router;

@@ -17,9 +17,60 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
     const toast = useToast();
 
     
-    const handleAddUser = () => {
-        
-    }
+    const handleAddUser = async (userToAdd) => {
+        if (selectedChat.users.find((u) => u._id === userToAdd._id)) {
+          toast({
+            title: "User Already in group!",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "bottom",
+          });
+          return;
+        }
+    
+        if (selectedChat.groupAdmin._id !== user._id) {
+          toast({
+            title: "Only admins can add someone!",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "bottom",
+          });
+          return;
+        }
+    
+        try {
+          setLoading(true);
+          const config = {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          };
+          const { data } = await axios.put(
+            `/api/chat/add_to_group`,
+            {
+              chatId: selectedChat._id,
+              userId: userToAdd._id,
+            },
+            config
+          );
+    
+          setSelectedChat(data);
+          setFetchAgain(!fetchAgain);
+        } catch (error) {
+          toast({
+            title: "Error Occured!",
+            description: error.response.data.message,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "bottom",
+          });
+        }
+        setLoading(false);
+        setGroupChatName("");
+    };
 
     const handleRemove = () => {
 
