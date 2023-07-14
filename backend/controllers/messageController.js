@@ -3,6 +3,8 @@ const Message = require("../models/messageModel");
 const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
 
+//@description    create new message
+//@route          POST /api/messages/
 const sendMessage = asyncHandler(async (req, res) => {
     const { content, chatId } = req.body;
 
@@ -39,6 +41,23 @@ const sendMessage = asyncHandler(async (req, res) => {
     }
 });
 
+//@description    Get all Messages
+//@route          GET /api/messages/:chatId
+const allMessages = asyncHandler(async (req, res) => {
+    try{
+        const messages = await Message.find({chat: req.params.chatId})
+        .populate("sender", "name email pic")
+        .populate("chat");
+        
+        res.json(messages);
+        
+    }catch(err) {
+        res.status(400);
+        throw new Error(error.message);
+    }
+})
+
 module.exports = {
     sendMessage,
+    allMessages
 }
