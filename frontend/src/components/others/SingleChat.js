@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ChatState } from '../../context/ChatProvider';
 import { Box, FormControl, IconButton, Input, Spinner, Text, useToast } from '@chakra-ui/react';
 import { ArrowBackIcon, ChatIcon } from '@chakra-ui/icons';
@@ -14,6 +14,43 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const toast = useToast();
+
+  const fetchMessages = async() => {
+    if(!selectedChat) return;
+
+    try{
+      setLoading(true);
+
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`
+        }
+      };
+
+      const { data } = await axios.get(
+        `/api/messages/${selectedChat._id}`,
+        config
+      );
+
+      setMessages(data);
+    }catch(err) {
+      console.log(err);
+      toast({
+        title: "Error Occured!",
+        description: "Failed to Load the Messages",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat]);
 
   const sendMessage = async (event) => {
 

@@ -37,7 +37,7 @@ const sendMessage = asyncHandler(async (req, res) => {
         });
 
         res.json(populatedMessage);
-        
+
     } catch(err) {
         res.status(400);
         throw new Error(err.message);
@@ -49,6 +49,7 @@ const sendMessage = asyncHandler(async (req, res) => {
 const allMessages = asyncHandler(async (req, res) => {
     try{
         const messages = await Message.find({chat: req.params.chatId})
+        .sort({ createdAt: -1 }) // Sort by createdAt field in descending order
         .populate("sender", "name email pic")
         .populate("chat");
         
@@ -56,9 +57,9 @@ const allMessages = asyncHandler(async (req, res) => {
         
     }catch(err) {
         res.status(400);
-        throw new Error(error.message);
+        throw new Error(err.message);
     }
-})
+});
 
 module.exports = {
     sendMessage,
