@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Text, Tooltip, Avatar, MenuDivider, useDisclosure, Input, Toast, useToast, Spinner } from '@chakra-ui/react';
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Text, Tooltip, Avatar, MenuDivider, useDisclosure, Input, Toast, useToast, Spinner, Badge } from '@chakra-ui/react';
 import {Drawer,DrawerBody,DrawerFooter,DrawerHeader,DrawerOverlay,DrawerContent,DrawerCloseButton} from '@chakra-ui/react'
 import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { ChatState } from '../../context/ChatProvider';
@@ -130,7 +130,28 @@ const SideDrawer = () => {
       <div>
       <Menu>
         <MenuButton pr='8' >
-          <BellIcon boxSize='7' />
+        <Box position="relative" display="inline-block">
+          <BellIcon boxSize="7" />
+
+          {notifications.length > 0 && (
+            <Badge
+              position="absolute"
+              top="-10px"
+              right="-12px"
+              fontSize="18px"
+              minWidth="24px"
+              height="24px"
+              borderRadius="50%"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              bg="red"
+              color="white"
+              >
+              {notifications.length}
+            </Badge>
+          )}
+      </Box>
         </MenuButton>
         <MenuList>
           {notifications.length === 0 ? (
