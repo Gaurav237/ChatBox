@@ -14,7 +14,7 @@ const SideDrawer = () => {
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
-  const { user, setSelectedChat, chats, setChats } = ChatState();
+  const { user, setSelectedChat, chats, setChats, notifications, setNotifications } = ChatState();
   const history = useHistory();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
@@ -93,6 +93,11 @@ const SideDrawer = () => {
     setLoadingChat(false);
   }
 
+  const getSenderId = (users) => {
+    const loggedUser = user;
+    return (users[0]._id === loggedUser._id) ? users[1] : users[0];
+  }
+
   return (
     <>
       <Box
@@ -128,9 +133,29 @@ const SideDrawer = () => {
           <BellIcon boxSize='7' />
         </MenuButton>
         <MenuList>
-          <MenuItem>notification 1</MenuItem>
-          <MenuItem>notification 2</MenuItem>
-        </MenuList>
+          {notifications.length === 0 ? (
+            <MenuItem>No New Messages</MenuItem>
+          ) : (
+            notifications.map((notif) => {
+              // console.log(user);
+              return (
+                <MenuItem 
+                key={notif._id}
+                onClick={() => {
+                  setSelectedChat(notif.chat);
+                  setNotifications(notifications.filter((n) => n !== notif));
+                }}
+                >
+                  {notif.chat.isGroupChat
+                    ? `New Message in ${notif.chat.chatName}`
+                    : `New Message from User (id: ${getSenderId(notif.chat.users)})`
+                  }
+                </MenuItem>
+              );
+            })
+          )}
+      </MenuList>
+
       </Menu>
 
       {/* profile menu  */}

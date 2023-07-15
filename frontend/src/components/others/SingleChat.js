@@ -87,7 +87,6 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
       }
     });
   })
-  console.log(notifications);
 
   const sendMessage = async (event) => {
 
