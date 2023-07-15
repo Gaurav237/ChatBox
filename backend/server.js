@@ -84,5 +84,10 @@ io.on('connection', (socket) => {
         }else{
             console.log('chat.users not defined');
         }
+
+        socket.off('setup', () => {
+            console.log('USER DISCONNECTED');
+            socket.leave(userData._id);
+        });
     })
 });
