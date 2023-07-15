@@ -6,7 +6,7 @@ import UserBadgeItem from '../UserAvatar/UserBadgeItem';
 import axios from 'axios';
 import UserListItem from '../UserAvatar/UserListItem';
 
-const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
+const UpdateGroupChatModal = ({ fetchMessages , fetchAgain, setFetchAgain }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { user, selectedChat, setSelectedChat } = ChatState();
     const [groupChatName, setGroupChatName] = useState();
@@ -130,7 +130,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
             position: "bottom",
           });
         }
-
+        fetchMessages();
       } catch(err) {
         toast({
           title: "Error Occurred",

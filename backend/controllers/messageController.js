@@ -49,7 +49,7 @@ const sendMessage = asyncHandler(async (req, res) => {
 const allMessages = asyncHandler(async (req, res) => {
     try{
         const messages = await Message.find({chat: req.params.chatId})
-        .sort({ createdAt: -1 }) // Sort by createdAt field in descending order
+        // .sort({ createdAt: -1 }) // Sort by createdAt field in descending order
         .populate("sender", "name email pic")
         .populate("chat");
         
