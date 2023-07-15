@@ -6,6 +6,8 @@ import { getSender, getSenderObject } from '../../config/ChatMethods';
 import ProfileModal from '../miscellaneous/ProfileModal'
 import UpdateGroupChatModal from '../miscellaneous/UpdateGroupChatModal';
 import axios from 'axios';
+import ScrollableChat from './ScrollableChat';
+import '../style.css';
 
 const SingleChat = ({fetchAgain, setFetchAgain}) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
@@ -143,8 +145,8 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
         <Spinner size={'xl'} w={20} h={20} margin={'auto'} color={'teal'} thickness='6px' />
       ): (
         <>
-          <div>
-            {/* Messages */}
+          <div className='messages'>
+            <ScrollableChat messages={messages}/>
           </div>
         </>
       )}
