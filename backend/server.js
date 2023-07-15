@@ -38,7 +38,9 @@ const server = app.listen(port, (err) => {
 });
 
 // FOR SOCKET IO CONFIGURATION
-const io = require('socket.io')(server, {
+const socketIO = require('socket.io');
+
+const io = socketIO(server, {
     pingTimeout: 60000,
     cors: {
         origin: 'http://localhost:3000'
@@ -58,4 +60,21 @@ io.on('connection', (socket) => {
         socket.join(room);
         console.log(`User joined room : ${room}`);
     });
+
+    socket.on('new message', (newMessageReceived) => {
+        var chat = newMessageReceived.chat;
+
+        if(chat.users) {
+            chat.users.forEach((userId) => {
+                if(userId === newMessageReceived.sender._id){
+                    return;
+                }
+                
+                // 'IN' means inside that user's room, emit/send that message
+                socket.in(userId).emit('message received', newMessageReceived);
+            });
+        }else{
+            console.log('chat.users not defined');
+        }
+    })
 });

@@ -23,6 +23,12 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
   const [newMessage, setNewMessage] = useState("");
   const toast = useToast();
 
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit('setup', user);
+    socket.on('connection', () => setSocketConnected(true));
+  }, []);
+
   const fetchMessages = async() => {
     if(!selectedChat) return;
 
@@ -60,7 +66,20 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
 
   useEffect(() => {
     fetchMessages();
+
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on('message received', (newMessageReceived) => {
+      if(!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id){
+        // give notification
+        console.log('notify');
+      }else{
+        setMessages([...messages, newMessageReceived]);
+      }
+    });
+  })
 
   const sendMessage = async (event) => {
 
@@ -83,6 +102,8 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
         );
         
         setMessages([...messages, data]);
+        socket.emit('new message', data);
+
       }catch(err) {
         toast({
           title: "Error Occured!",
@@ -101,12 +122,6 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
     setNewMessage(event.target.value);
     // Typing Indicator Logic
   }
-
-  useEffect(() => {
-    socket = io(ENDPOINT);
-    socket.emit('setup', user);
-    socket.on('connection', () => setSocketConnected(true));
-  }, []);
 
   return (
     <>
