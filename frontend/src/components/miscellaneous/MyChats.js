@@ -97,12 +97,14 @@ const MyChats = ({ fetchAgain }) => {
                 borderRadius='lg'
                 key={chat._id}
               >
-                <Text>
-                  {
-                  chat.isGroupChat 
-                  ? (chat.chatName) 
-                  : getSender(loggedUser, chat.users) 
-                  }
+                <Text fontWeight={selectedChat === chat ? 'bold' : 'normal'} fontSize="lg" textTransform="capitalize">
+                  <Box>{chat.isGroupChat ? chat.chatName : getSender(loggedUser, chat.users)}</Box>
+                  <Box fontSize="sm" color="gray.500">
+                    { chat.latestMessage
+                        ? chat.latestMessage.sender.name + ': ' + chat.latestMessage.content
+                        : 'No messages'
+                    }
+                  </Box>
                 </Text>
               </Box>
             })}
