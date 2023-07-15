@@ -42,6 +42,8 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
       );
 
       setMessages(data);
+      setLoading(false);
+      socket.emit('join chat', selectedChat._id);
     }catch(err) {
       console.log(err);
       toast({
@@ -52,8 +54,8 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
         isClosable: true,
         position: "top-right",
       });
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   useEffect(() => {

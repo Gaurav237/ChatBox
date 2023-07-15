@@ -52,4 +52,10 @@ io.on('connection', (socket) => {
         socket.join(userData._id);  // created a room for particular user
         socket.emit('connected');
     });
+
+    // creates a new room on seletced chat, with users which are logged in that 
+    socket.on('join chat', (room) => {
+        socket.join(room);
+        console.log(`User joined room : ${room}`);
+    });
 });
