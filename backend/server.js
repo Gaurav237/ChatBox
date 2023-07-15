@@ -4,6 +4,8 @@ const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const { notFound, errorHandler } = require('./middleware/errorHandlingMiddleware');
+const path = require('path');
+
 // for setting environment variables
 const dotenv = require('dotenv');
 dotenv.config();
@@ -16,13 +18,27 @@ const port = process.env.PORT || 8000;
 const app = express();
 app.use(express.json());  // parsing JSON data from the request body
 
-app.get('/', (req, res) => {
-    res.send("API is running");
-});
 
 app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/messages', messageRoutes);
+
+// ----------------------- Deployment code ---------------------------
+
+const __dirname1 = path.resolve();
+if(process.env.NODE_ENV === 'production'){
+    app.use(express.static(path.join(__dirname1, '/frontend/build')));
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname1, 'frontend', 'build', 'index.html'));
+    })
+}else{
+    app.get('/', (req, res) => {
+        res.send("API is running");
+    });
+}
+
+// ----------------------- Deployment code ---------------------------
 
 // API Error Handlers => (add at end of all routes)
 app.use(notFound); // handles requests for routes that do not exist
