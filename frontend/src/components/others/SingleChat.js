@@ -21,12 +21,16 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [typing, setTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit('setup', user);
-    socket.on('connection', () => setSocketConnected(true));
+    socket.on('connected', () => setSocketConnected(true));
+    socket.on("typing", () => setIsTyping(true));
+    socket.on("stop typing", () => setIsTyping(false));
   }, []);
 
   const fetchMessages = async() => {
@@ -84,6 +88,9 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
   const sendMessage = async (event) => {
 
     if(event.key === 'Enter' && newMessage){
+    
+      socket.emit('stop typing', selectedChat._id);
+
       try {
         const config = {
           headers: {
@@ -121,6 +128,27 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
   const typingHandler = (event) => {
     setNewMessage(event.target.value);
     // Typing Indicator Logic
+
+    if (!socketConnected) return;
+
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat._id);
+    }else{
+      let lastTypingTime = new Date().getTime();
+      var timerLength = 3000;
+      
+      clearTimeout(typingTimeout); // Clear the previous timeout to prevent multiple timeouts running simultaneously
+      
+      var typingTimeout = setTimeout(() => {
+        var timeNow = new Date().getTime();
+        var timeDiff = timeNow - lastTypingTime;
+        if (timeDiff >= timerLength && typing) {
+          socket.emit('stop typing', selectedChat._id);
+          setTyping(false);
+        }
+      }, timerLength);
+    }
   }
 
   return (
@@ -181,6 +209,9 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
       )}
 
       <FormControl onKeyDown={sendMessage} mt={3} isRequired>
+
+        {isTyping && <div>Typing...</div>}
+
         <Input
           variant="filled"
           bg="white"
