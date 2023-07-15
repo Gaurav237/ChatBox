@@ -28,11 +28,28 @@ app.use('/api/messages', messageRoutes);
 app.use(notFound); // handles requests for routes that do not exist
 app.use(errorHandler);
 
-app.listen(port, (err) => {
+const server = app.listen(port, (err) => {
     if(err){
         console.log('error in running the server ', err);
         return;
     }
 
     console.log('Server is up and running on port', port);
-})
+});
+
+// FOR SOCKET IO CONFIGURATION
+const io = require('socket.io')(server, {
+    pingTimeout: 60000,
+    cors: {
+        origin: 'http://localhost:3000'
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('connected to socket.io');
+
+    socket.on('setup', (userData) => {
+        socket.join(userData._id);  // created a room for particular user
+        socket.emit('connected');
+    });
+});

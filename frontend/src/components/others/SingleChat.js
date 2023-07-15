@@ -8,10 +8,16 @@ import UpdateGroupChatModal from '../miscellaneous/UpdateGroupChatModal';
 import axios from 'axios';
 import ScrollableChat from './ScrollableChat';
 import '../style.css';
+import io from 'socket.io-client';
+
+const ENDPOINT = "http://localhost:8000";
+var socket;
+var selectedChatCompare;
 
 const SingleChat = ({fetchAgain, setFetchAgain}) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
 
+  const [socketConnected, setSocketConnected] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
@@ -93,6 +99,12 @@ const SingleChat = ({fetchAgain, setFetchAgain}) => {
     setNewMessage(event.target.value);
     // Typing Indicator Logic
   }
+
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit('setup', user);
+    socket.on('connection', () => setSocketConnected(true));
+  }, []);
 
   return (
     <>
